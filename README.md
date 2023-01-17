@@ -23,3 +23,5 @@ If you're having trouble activating the venv on windows try doing activate.ps1 i
 ### TODO
 - Add some more edge case handling
 - General improvements
+- Make download speeds consistent
+- Make the -1 pages thing actually work lmao
