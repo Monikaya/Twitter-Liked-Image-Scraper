@@ -1,32 +1,37 @@
 import os
 import tweepy
 import time
+import asyncio
 
 import urllib.request
 
 from dotenv import load_dotenv
 
 
-def get_client():
+async def get_client():
     client = tweepy.Client(os.getenv("BEARER_TOKEN"))
     return client
 
+async def get_pages(client, page_limit):
+    pages = []
 
-def get_urls(client):
-    media = client.get_liked_tweets(
-        id=1610756529346469889,
-        max_results=100,
+    for response in tweepy.Paginator(client.get_liked_tweets, id="1610756529346469889", 
+        max_results=10,
         expansions="attachments.media_keys",
         media_fields="url",
-    ).includes["media"]
-    print(media)
-    ids = []
-    for tweet in media:
-        print(tweet.url)
-        ids.append(tweet.url)
-    return ids
+        limit=page_limit):
+        pages.append(response.includes["media"])
+    return pages
+
+async def format_pages(page):
+    urls = []
+    for tweet in page:
+        urls.append(tweet.url)
+    return urls
         
-def download_image(urls):
+async def download_images(page):
+    urls = await format_pages(page)
+
     os.makedirs("images", exist_ok=True)
     for url in urls:
         filename = url.split("/")[-1]
@@ -37,14 +42,34 @@ def download_image(urls):
         print(f"Downloading {filename}...")
         urllib.request.urlretrieve(url, filepath)
         print(f"Downloaded {filename}!")
-        time.sleep(1)
+        await asyncio.sleep(1)
 
+def clear():
+    os.system("cls" if os.name=='nt' else 'clear')
 
-def start():
+async def start():
+    clear()
+
     load_dotenv()
-    client = get_client()
-    urls = get_urls(client)
-    download_image(urls)
+    print("Welcome to my Twitter Liked Image Downloader!")
+    print("If you would like to iterate over all of your liked tweets input '-1'")
+    print("One page is equivalent to 10 tweets")
+    num_pages = input("How many pages of tweets do you want to download? ")
+    client = await get_client()
+    pages = await get_pages(client, int(num_pages))
+
+    print("Downloading images... This may take a while...")
+    await asyncio.sleep(2)
+    tasks = [asyncio.create_task(download_images(page)) for page in pages]
+    for task in tasks:
+        await task
+    
+    await asyncio.sleep(1)
+    clear()
+    print("Done! All images have been downloaded to the images folder!")
+    print("Thanks for using my Twitter Liked Image Downloader! :D")
+    input("Press enter to exit...")
+    exit()
 
 
-start()
+asyncio.run(start())
