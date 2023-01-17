@@ -1,6 +1,5 @@
 import os
 import tweepy
-import time
 import asyncio
 
 import urllib.request
@@ -12,10 +11,10 @@ async def get_client():
     client = tweepy.Client(os.getenv("BEARER_TOKEN"))
     return client
 
-async def get_pages(client, page_limit):
+async def get_pages(client, page_limit, user_id):
     pages = []
 
-    for response in tweepy.Paginator(client.get_liked_tweets, id="1610756529346469889", 
+    for response in tweepy.Paginator(client.get_liked_tweets, id=user_id, 
         max_results=10,
         expansions="attachments.media_keys",
         media_fields="url",
@@ -49,6 +48,15 @@ def clear():
 
 async def start():
     clear()
+    if not os.path.exists(".env"):
+        print("Seems you don't have a .env file!")
+        print("Let's create one!!")
+        bearer = input("Please input your bearer token: (If you don't know what this is, check the README!) ")
+        user_id = input("Please input your desired twitter user id: ")
+        with open(".env", "w") as f:
+            f.write(f'BEARER_TOKEN="{bearer}"\n')
+            f.write(f'USER_ID="{user_id}"')
+        print("Done! Now let's get to downloading some images!")
 
     load_dotenv()
     print("Welcome to my Twitter Liked Image Downloader!")
@@ -56,7 +64,7 @@ async def start():
     print("One page is equivalent to 10 tweets")
     num_pages = input("How many pages of tweets do you want to download? ")
     client = await get_client()
-    pages = await get_pages(client, int(num_pages))
+    pages = await get_pages(client, int(num_pages), os.getenv("USER_ID"))
 
     print("Downloading images... This may take a while...")
     await asyncio.sleep(2)
