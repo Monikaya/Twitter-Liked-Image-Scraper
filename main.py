@@ -1,5 +1,8 @@
 import os
 import tweepy
+import time
+
+import urllib.request
 
 from dotenv import load_dotenv
 
@@ -9,24 +12,39 @@ def get_client():
     return client
 
 
-def get_media_keys(client):
+def get_urls(client):
     media = client.get_liked_tweets(
         id=1610756529346469889,
+        max_results=100,
         expansions="attachments.media_keys",
-        max_results=5,
-        media_fields=["url", "height"],
-    )[1]["media"]
-    media_keys = []
+        media_fields="url",
+    ).includes["media"]
+    print(media)
+    ids = []
     for tweet in media:
-        media_keys.append(tweet["media_key"])
-    return media_keys
+        print(tweet.url)
+        ids.append(tweet.url)
+    return ids
+        
+def download_image(urls):
+    os.makedirs("images", exist_ok=True)
+    for url in urls:
+        filename = url.split("/")[-1]
+        filepath = os.path.join("images", filename)
+        if os.path.exists(filepath):
+            print(f"Skipping {filename} because it already exists")
+            continue
+        print(f"Downloading {filename}...")
+        urllib.request.urlretrieve(url, filepath)
+        print(f"Downloaded {filename}!")
+        time.sleep(1)
 
 
 def start():
     load_dotenv()
     client = get_client()
-    media_keys = get_media_keys(client)
-    print(media_keys)
+    urls = get_urls(client)
+    download_image(urls)
 
 
 start()
