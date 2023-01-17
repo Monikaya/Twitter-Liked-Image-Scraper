@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 
 async def get_client():
-    client = tweepy.Client(os.getenv("BEARER_TOKEN"))
+    client = tweepy.Client(os.getenv("BEARER_TOKEN"), wait_on_rate_limit=True)
     return client
 
 async def get_pages(client, page_limit, user_id):
