@@ -1,6 +1,7 @@
 import os
 import tweepy
 import asyncio
+import shutil
 
 import urllib.request
 
@@ -18,8 +19,12 @@ async def get_pages(client, page_limit, user_id):
         max_results=10,
         expansions="attachments.media_keys",
         media_fields="url",
-        limit=page_limit):
-        pages.append(response.includes["media"])
+        limit = page_limit if page_limit > 0 else float("inf")):
+        print(response)
+        try:
+            pages.append(response.includes["media"])
+        except KeyError:
+            continue
     return pages
 
 async def format_pages(page):
@@ -33,21 +38,25 @@ async def download_images(page):
 
     os.makedirs("images", exist_ok=True)
     for url in urls:
-        filename = url.split("/")[-1]
-        filepath = os.path.join("images", filename)
-        if os.path.exists(filepath):
-            print(f"Skipping {filename} because it already exists")
+        try:
+            filename = url.split("/")[-1]
+            filepath = os.path.join("images", filename)
+            if os.path.exists(filepath):
+                print(f"Skipping {filename} because it already exists")
+                continue
+            print(f"Downloading {filename}...")
+            urllib.request.urlretrieve(url, filepath)
+            print(f"Downloaded {filename}!")
+        except Exception:
+            print(f"Failed to download a file!")
             continue
-        print(f"Downloading {filename}...")
-        urllib.request.urlretrieve(url, filepath)
-        print(f"Downloaded {filename}!")
+        
         await asyncio.sleep(1)
 
 def clear():
     os.system("cls" if os.name=='nt' else 'clear')
 
-async def start():
-    clear()
+def setup_env():
     if not os.path.exists(".env"):
         print("Seems you don't have a .env file!")
         print("Let's create one!!")
@@ -58,6 +67,9 @@ async def start():
             f.write(f'USER_ID="{user_id}"')
         print("Done! Now let's get to downloading some images!")
 
+async def start():
+    clear()
+    setup_env()
     load_dotenv()
     print("Welcome to my Twitter Liked Image Downloader!")
     print("If you would like to iterate over all of your liked tweets input '-1'")
@@ -75,6 +87,10 @@ async def start():
     await asyncio.sleep(1)
     clear()
     print("Done! All images have been downloaded to the images folder!")
+    if input("Last thing, would you like to pack all of the images into a zip file? (y/n) ") == "y":
+        shutil.make_archive("images", "zip", "images")
+        print("Done! The zip file is in the same directory as the script!")
+        await asyncio.sleep(1)
     print("Thanks for using my Twitter Liked Image Downloader! :D")
     input("Press enter to exit...")
     exit()
