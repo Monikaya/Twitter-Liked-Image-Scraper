@@ -48,7 +48,7 @@ async def download_images(page):
             urllib.request.urlretrieve(url, filepath)
             print(f"Downloaded {filename}!")
         except Exception:
-            print(f"Failed to download a file!")
+            print(f"Failed to download a file! Skipping...")
             continue
         
         await asyncio.sleep(1)
