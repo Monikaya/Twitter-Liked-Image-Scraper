@@ -5,7 +5,11 @@ A thing to scrape funny twitter images
 ```bash
 $ git clone https://github.com/Monikaya/Twitter-Liked-Image-Scraper.git
 $ cd Twitter-Liked-Image-Scraper
+```
+```bash
 $ ./venv/bin/activate
+OR
+$ pip install -r requirements.txt
 ```
 After that, you should just be able to run:
 ```bash
@@ -21,5 +25,4 @@ Pull requests always welcome
 If you're having trouble activating the venv on windows try doing activate.ps1 instead of just activate. Should solve it
 
 ### TODO
-- Make download speeds consistent
-- Some other misc features, mostly done though
+- Possibly make tweepy async, wouldn't really benefit though
