@@ -86,9 +86,13 @@ async def start():
     print("Welcome to my Twitter Liked Image Downloader!")
     print("If you would like to iterate over all of your liked tweets input '-1'")
     num_tweets = input("How many tweets would you like to download? ")
-    if int(num_tweets) < 10000 and int(num_tweets) > 25:
-        num_pages = math.sqrt(int(num_tweets))
-        tweets_per_page = None
+    if int(num_tweets) < 10000 and int(num_tweets) > 25 or int(num_tweets) == -1:
+        if not int(num_tweets) == -1:
+            num_pages = math.sqrt(int(num_tweets))
+            tweets_per_page = None
+        else:
+            num_pages = -1
+            tweets_per_page = 100
     else:
         print("Your number appears to be either above 10000 or below 25")
         print("Unfortunately we can't process those numbers at the moment")
