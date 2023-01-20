@@ -1,5 +1,5 @@
 # Twitter-Liked-Image-Scraper
-A thing to scrape funny twitter images
+A thing I made to scrape funny twitter images
 
 ### Setup
 ```bash
