@@ -92,7 +92,7 @@ async def start():
             tweets_per_page = None
         else:
             num_pages = -1
-            tweets_per_page = 100
+            tweets_per_page = 50
     else:
         print("Your number appears to be either above 10000 or below 25")
         print("Unfortunately we can't process those numbers at the moment")
