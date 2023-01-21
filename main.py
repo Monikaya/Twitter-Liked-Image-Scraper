@@ -103,7 +103,9 @@ async def start():
         satisfied = False
         while not satisfied:
             num_pages = input("How many pages would you like to iterate over? ")
-            tweets_per_page = input("How many tweets per page would you like to iterate over? ")
+            tweets_per_page = input(
+                "How many tweets per page would you like to iterate over? "
+            )
             print(num_pages)
             print(tweets_per_page)
             print(int(num_pages) * int(tweets_per_page))
@@ -113,7 +115,12 @@ async def start():
                 print("Great! Let's get to downloading some images!")
 
     client = await get_client()
-    pages = await get_pages(client, int(num_pages), tweets_per_page if tweets_per_page != None else None, os.getenv("USER_ID"))
+    pages = await get_pages(
+        client,
+        int(num_pages),
+        tweets_per_page if tweets_per_page != None else None,
+        os.getenv("USER_ID"),
+    )
 
     print("Downloading images... This may take a while...")
     await asyncio.sleep(2)
